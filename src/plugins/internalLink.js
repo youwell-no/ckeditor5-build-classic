@@ -36,13 +36,21 @@ export default class InternalLink extends Plugin {
 
 			// Callback executed once the image is clicked.
 			view.on( 'execute', () => {
-				const linkObject = { name: 'New Link', id: new Date().now }; // need input via Adapter ??
+				if ( !this.linkObjectFunction ) {
+					// eslint-disable-next-line no-undef
+					console.warn( 'No linkObjectFunction defined!' );
+					return;
+				}
 
-				editor.model.change( writer => {
-					const imageElement = writer.createElement( 'internalLink', linkObject );
+				// const linkObject = { name: 'New Link', id: new Date().now }; // need input via Adapter ??
 
-					// Insert the image in the current selection location.
-					editor.model.insertContent( imageElement, editor.model.document.selection );
+				this.linkObjectFunction().then( linkObject => {
+					editor.model.change( writer => {
+						const imageElement = writer.createElement( 'internalLink', linkObject );
+
+						// Insert the image in the current selection location.
+						editor.model.insertContent( imageElement, editor.model.document.selection );
+					} );
 				} );
 			} );
 

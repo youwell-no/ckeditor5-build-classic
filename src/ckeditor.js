@@ -44,6 +44,24 @@ import InternalLink from './plugins/internalLink';
 
 export default class ClassicEditor extends ClassicEditorBase {}
 
+// / --- testing
+
+const TestInternalLinkObjectGetterPlugin = editor => {
+	const linkPlugin = editor.plugins.get( 'InternalLink' );
+	if ( !linkPlugin ) {
+		// eslint-disable-next-line no-undef
+		console.log( 'no linkPlugin' );
+	}
+	linkPlugin.linkObjectFunction = () => {
+		// eslint-disable-next-line no-undef
+		console.log( 'her er vi i link-funksjon' );
+	};
+};
+
+ClassicEditor.extraPlugins = [ TestInternalLinkObjectGetterPlugin ];
+
+// / --- testing
+
 // Plugins to include in the build.
 ClassicEditor.builtinPlugins = [
 	Essentials,
