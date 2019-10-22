@@ -38,6 +38,10 @@ import Subscript from '@ckeditor/ckeditor5-basic-styles/src/subscript';
 import Superscript from '@ckeditor/ckeditor5-basic-styles/src/superscript';
 // ------
 
+// ---- Custom plugins
+import InternalLink from './plugins/internalLink';
+// ------
+
 export default class ClassicEditor extends ClassicEditorBase {}
 
 // Plugins to include in the build.
@@ -65,7 +69,12 @@ ClassicEditor.builtinPlugins = [
 	TableToolbar,
 	Highlight,
 	Alignment,
-	Underline, Strikethrough, Code, Subscript, Superscript
+	Underline,
+	Strikethrough,
+	Code,
+	Subscript,
+	Superscript,
+	InternalLink,
 ];
 
 // Editor configuration.
@@ -83,6 +92,7 @@ ClassicEditor.defaultConfig = {
 			'bulletedList',
 			'numberedList',
 			'link',
+			'internalLink',
 			'imageUpload',
 			'highlight',
 			'insertTable',
