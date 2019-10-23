@@ -8,11 +8,10 @@ import {
 
 import './internalLink.css';
 
-
 // To use this plugin the client needs to define an AdapterPlugin that provides a select-mechanism for internal objects.
 // Put this AdapterPlugin in the 'extraPlugins'-array on the editor
 // It should follow the following pattern:
-// 
+//
 // function CKEditorInternalLinkAdapterPlugin( editor ) {
 // 	const linkPlugin = editor.plugins.get( 'InternalLink' );
 // 	linkPlugin.linkObjectSelector = {
@@ -23,7 +22,6 @@ import './internalLink.css';
 // 		}
 // 	};
 // }
-
 
 export default class InternalLink extends Plugin {
 	static get pluginName() {
@@ -109,14 +107,16 @@ export default class InternalLink extends Plugin {
 
 		conversion.for( 'upcast' ).elementToElement( {
 			view: {
-				name: 'span',
+				name: 'a',
 				classes: [ 'internalLink' ]
 			},
 			model: ( viewElement, modelWriter ) => {
 				const name = viewElement.getChild( 0 ).data;
+				const id = viewElement.getAttribute( 'data-elementid' );
 
 				return modelWriter.createElement( 'internalLink', {
-					name
+					name,
+					id,
 				} );
 			}
 		} );
@@ -141,9 +141,9 @@ export default class InternalLink extends Plugin {
 			const name = modelItem.getAttribute( 'name' );
 			const id = modelItem.getAttribute( 'id' );
 
-			const linkView = viewWriter.createContainerElement( 'span', {
+			const linkView = viewWriter.createContainerElement( 'a', {
 				class: 'internalLink',
-				linkTo: id,
+				'data-elementid': id,
 			} );
 
 			// Insert the link-name (as a text)
