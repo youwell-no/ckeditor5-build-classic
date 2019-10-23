@@ -1,11 +1,11 @@
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
-import linkIcon from '@ckeditor/ckeditor5-link/theme/icons/link.svg';
 import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview';
 import {
 	toWidget,
 	viewToModelPositionOutsideModelElement
 } from '@ckeditor/ckeditor5-widget/src/utils';
 
+import linkIcon from '../../icons/link2.svg';
 import './internalLink.css';
 
 // To use this plugin the client needs to define an AdapterPlugin that provides a select-mechanism for internal objects.
@@ -23,6 +23,20 @@ import './internalLink.css';
 // 	};
 // }
 
+function addTranslations( language, translations ) {
+	// eslint-disable-next-line no-undef
+	if ( !window.CKEDITOR_TRANSLATIONS ) {
+		// eslint-disable-next-line no-undef
+		window.CKEDITOR_TRANSLATIONS = {};
+	}
+
+	// eslint-disable-next-line no-undef
+	const dictionary = window.CKEDITOR_TRANSLATIONS[ language ] || ( window.CKEDITOR_TRANSLATIONS[ language ] = {} );
+
+	// Extend the dictionary for the given language.
+	Object.assign( dictionary, translations );
+}
+
 export default class InternalLink extends Plugin {
 	static get pluginName() {
 		return 'InternalLink';
@@ -38,6 +52,10 @@ export default class InternalLink extends Plugin {
 
 		this._defineSchema();
 		this._defineConverters();
+
+		addTranslations( 'no', {
+			'Link to content': 'Lenke til innhold',
+		} );
 
 		editor.editing.mapper.on(
 			'viewToModelPosition',
@@ -60,7 +78,7 @@ export default class InternalLink extends Plugin {
 
 			else {
 				view.set( {
-					label: t( 'Add internal link' ),
+					label: t( 'Link to content' ),
 					icon: linkIcon,
 					tooltip: true,
 				} );
