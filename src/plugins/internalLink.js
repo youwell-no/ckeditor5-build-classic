@@ -8,7 +8,28 @@ import {
 
 import './internalLink.css';
 
+
+// To use this plugin the client needs to define an AdapterPlugin that provides a select-mechanism for internal objects.
+// Put this AdapterPlugin in the 'extraPlugins'-array on the editor
+// It should follow the following pattern:
+// 
+// function CKEditorInternalLinkAdapterPlugin( editor ) {
+// 	const linkPlugin = editor.plugins.get( 'InternalLink' );
+// 	linkPlugin.linkObjectSelector = {
+// 		select: selectedCallback => {
+// 			// TODO: Select your object
+//			// Object form: { name: 'some name', id: 'some id' }
+// 			selectedCallback( mySelectedObject );
+// 		}
+// 	};
+// }
+
+
 export default class InternalLink extends Plugin {
+	static get pluginName() {
+		return 'InternalLink';
+	}
+
 	// static get requires() {
 	// 	return [Widget];
 	// }
@@ -28,31 +49,38 @@ export default class InternalLink extends Plugin {
 		editor.ui.componentFactory.add( 'internalLink', locale => {
 			const view = new ButtonView( locale );
 
-			view.set( {
-				label: t( 'Add internal link' ),
-				icon: linkIcon,
-				tooltip: true,
-			} );
+			if ( !this.linkObjectSelector ) {
+				// eslint-disable-next-line no-undef
+				console.warn( 'No linkObjectSelector defined for InternalLink. You need to provide a LinkAdapter' );
+			}
 
-			// Callback executed once the image is clicked.
-			view.on( 'execute', () => {
-				if ( !this.linkObjectFunction ) {
-					// eslint-disable-next-line no-undef
-					console.warn( 'No linkObjectFunction defined!' );
-					return;
-				}
+			else if ( !this.linkObjectSelector.select ) {
+				// eslint-disable-next-line no-undef
+				console.warn( 'No select function defined in linkObjectSelector. Your LinkAdapter needs a select function' );
+				return;
+			}
 
-				// const linkObject = { name: 'New Link', id: new Date().now }; // need input via Adapter ??
-
-				this.linkObjectFunction().then( linkObject => {
-					editor.model.change( writer => {
-						const imageElement = writer.createElement( 'internalLink', linkObject );
-
-						// Insert the image in the current selection location.
-						editor.model.insertContent( imageElement, editor.model.document.selection );
-					} );
+			else {
+				view.set( {
+					label: t( 'Add internal link' ),
+					icon: linkIcon,
+					tooltip: true,
 				} );
-			} );
+
+				// Callback executed once the image is clicked.
+				view.on( 'execute', () => {
+					this.linkObjectSelector.select(
+						linkObject => {
+							editor.model.change( writer => {
+								const imageElement = writer.createElement( 'internalLink', linkObject );
+
+								// Insert the image in the current selection location.
+								editor.model.insertContent( imageElement, editor.model.document.selection );
+							} );
+						}
+					);
+				} );
+			}
 
 			return view;
 		} );
