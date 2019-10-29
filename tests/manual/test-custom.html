@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="utf-8">
 	<title>CKEditor 5 – classic editor build – Custom tests</title>
@@ -8,67 +9,113 @@
 			max-width: 800px;
 			margin: 20px auto;
 		}
+
 	</style>
 </head>
+
 <body>
 
-<h1>CKEditor 5 – classic editor build – Custom tests</h1>
+	<h1>CKEditor 5 – classic editor build – Custom tests</h1>
 
-<h2>In the default language</h2>
+	<h2>In the default language</h2>
 
-<div id="editor">
-	<h2>About CKEditor&nbsp;5</h2>
+	<div id="editor">
+		<h2>About CKEditor&nbsp;5</h2>
 
-	<p>This is <a href="https://ckeditor.com">CKEditor&nbsp;5</a>.</p>
-</div>
+		<p>This is <a href="https://ckeditor.com">CKEditor&nbsp;5</a>.</p>
+	</div>
 
-<script src="../../build/ckeditor.js"></script>
-<script src="../../build/translations/no.js"></script>
-<script>
+	<br /><br /><br /><br /><br /><br />
 
-	function CKEditorInternalLinkAdapterPlugin( editor ) {
-		const linkPlugin = editor.plugins.get( 'InternalLink' );
+	<div id="inline-editor">
+		<h1>Inline</h1>
+		<h2>About CKEditor&nbsp;5</h2>
 
-		linkPlugin.linkObjectSelector = {
-			select: selectedCallback => {
-				selectedCallback( { name: 'some name', id: 'some id' } );
-			}
-		};
-	}
+		<p>This is <a href="https://ckeditor.com">CKEditor&nbsp;5</a>.</p>
+	</div>
 
-	ClassicEditor
-		.create( document.querySelector( '#editor' ), {
-			extraPlugins: [CKEditorInternalLinkAdapterPlugin],
-			toolbar: [
-			'heading',
-			'|',
-			'bold',
-			'italic',
-			'underline', 'strikethrough', 'code', 'subscript', 'superscript',
-			'alignment',
-			'blockQuote',
-			'|',
-			'bulletedList',
-			'numberedList',
-			'link',
-			'internalLink',
-			'imageUpload',
-			'highlight',
-			'insertTable',
-			'mediaEmbed',
-			'|',
-			'undo',
-			'redo'
-			],
-			language: 'no'
-		} )
-		.then( editor => {
-			window.editor = editor;
-		} )
-		.catch( err => {
-			console.error( err.stack );
-		} );
-</script>
+	<script src="../../build/index.js"></script>
+	<script src="../../build/translations/no.js"></script>
+	<script>
+		function CKEditorInternalLinkAdapterPlugin(editor) {
+			const linkPlugin = editor.plugins.get('InternalLink');
+
+			linkPlugin.linkObjectSelector = {
+				select: selectedCallback => {
+					selectedCallback({
+						name: 'some name',
+						id: 'some id'
+					});
+				}
+			};
+		}
+
+		YouwellEditors.ClassicEditor
+			.create(document.querySelector('#editor'), {
+				extraPlugins: [CKEditorInternalLinkAdapterPlugin],
+				toolbar: [
+					'heading',
+					'|',
+					'bold',
+					'italic',
+					'underline', 'strikethrough', 'code', 'subscript', 'superscript',
+					'alignment',
+					'blockQuote',
+					'|',
+					'bulletedList',
+					'numberedList',
+					'link',
+					'internalLink',
+					'imageUpload',
+					'highlight',
+					'insertTable',
+					'mediaEmbed',
+					'|',
+					'undo',
+					'redo'
+				],
+				language: 'no'
+			})
+			.then(editor => {
+				window.editor = editor;
+			})
+			.catch(err => {
+				console.error(err.stack);
+			});
+
+
+		YouwellEditors.InlineEditor.create(document.querySelector('#inline-editor'), {
+				extraPlugins: [CKEditorInternalLinkAdapterPlugin],
+				toolbar: [
+					'heading',
+					'|',
+					'bold',
+					'italic',
+					'underline',
+					'alignment',
+					'blockQuote',
+					'|',
+					'bulletedList',
+					'numberedList',
+					'link',
+					'internalLink',
+					'imageUpload',
+					'highlight',
+					'|',
+					'undo',
+					'redo'
+				],
+				language: 'no'
+			})
+			.then(editor => {
+				window.editor = editor;
+			})
+			.catch(err => {
+				console.error(err.stack);
+			});
+
+	</script>
 
 </body>
+
 </html>
