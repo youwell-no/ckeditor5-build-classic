@@ -51,32 +51,12 @@ export default class LinkUI extends Plugin {
 
 		editor.editing.view.addObserver( ClickObserver );
 
-		/**
-		 * The actions view displayed inside of the balloon.
-		 *
-		 * @member {module:link/ui/linkactionsview~LinkActionsView}
-		 */
 		this.actionsView = this._createActionsView();
-
-		/**
-		 * The form view displayed inside the balloon.
-		 *
-		 * @member {module:link/ui/linkformview~LinkFormView}
-		 */
 		this.formView = this._createFormView();
-
-		/**
-		 * The contextual balloon plugin instance.
-		 *
-		 * @private
-		 * @member {module:ui/panel/balloon/contextualballoon~ContextualBalloon}
-		 */
 		this._balloon = editor.plugins.get( ContextualBalloon );
 
-		// Create toolbar buttons.
+		this._checkForSelectMethod();
 		this._createToolbarLinkButton();
-
-		// Attach lifecycle actions to the the balloon.
 		this._enableUserBalloonInteractions();
 	}
 
@@ -88,6 +68,35 @@ export default class LinkUI extends Plugin {
 
 		// Destroy created UI components as they are not automatically destroyed (see ckeditor5#1341).
 		this.formView.destroy();
+	}
+
+	_checkForSelectMethod() {
+		const InternalLinkPlugin = this.editor.plugins.get( 'InternalLink' );
+
+		this.linkObjectSelector = InternalLinkPlugin.linkObjectSelector;
+		if ( !this.linkObjectSelector ) {
+			// eslint-disable-next-line no-undef
+			console.warn( 'No linkObjectSelector defined for InternalLink. You need to provide a LinkAdapter' );
+		}
+
+		else if ( !this.linkObjectSelector.select ) {
+			// eslint-disable-next-line no-undef
+			console.warn( 'No select function defined in linkObjectSelector. Your LinkAdapter needs a select function' );
+		}
+	}
+
+	_selectElement() {
+		const editor = this.editor;
+
+		this.linkObjectSelector.select(
+			linkObject => {
+				editor.execute( 'linkInternal', linkObject.id, { someExtraAttr: '123' } );
+
+				// samme som:
+				// const linkCommand = editor.commands.get( 'linkInternal' );
+				// linkCommand.execute( linkObject.id, { someExtraAttr: '123' } );
+			}
+		);
 	}
 
 	/**
