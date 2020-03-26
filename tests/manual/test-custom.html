@@ -55,27 +55,6 @@
 		YouwellEditors.ClassicEditor
 			.create(document.querySelector('#editor'), {
 				extraPlugins: [CKEditorInternalLinkAdapterPlugin],
-				toolbar: [
-					'heading',
-					'|',
-					'bold',
-					'italic',
-					'underline', 'strikethrough', 'code', 'subscript', 'superscript',
-					'alignment',
-					'blockQuote',
-					'|',
-					'bulletedList',
-					'numberedList',
-					'link',
-					'internalLink',
-					'imageUpload',
-					'highlight',
-					'insertTable',
-					'mediaEmbed',
-					'|',
-					'undo',
-					'redo'
-				],
 				language: 'no'
 			})
 			.then(editor => {
