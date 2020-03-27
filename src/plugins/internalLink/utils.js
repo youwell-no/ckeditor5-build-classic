@@ -8,6 +8,7 @@
  */
 
 import { upperFirst } from 'lodash-es';
+import { htmlClassName, htmlIdAttribute, internalLinkCustomProperty } from './constants';
 
 const ATTRIBUTE_WHITESPACES = /[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205f\u3000]/g; // eslint-disable-line no-control-regex
 const SAFE_URL = /^(?:(?:https?|ftps?|mailto):|[^a-z]|[a-z+.-]+(?:[^a-z+.:-]|$))/i;
@@ -19,7 +20,7 @@ const SAFE_URL = /^(?:(?:https?|ftps?|mailto):|[^a-z]|[a-z+.-]+(?:[^a-z+.:-]|$))
  * @returns {Boolean}
  */
 export function isLinkElement( node ) {
-	return node.is( 'attributeElement' ) && !!node.getCustomProperty( 'linkInternal' );
+	return node.is( 'attributeElement' ) && !!node.getCustomProperty( internalLinkCustomProperty );
 }
 
 /**
@@ -28,10 +29,10 @@ export function isLinkElement( node ) {
  * @param {String} href
  * @returns {module:engine/view/attributeelement~AttributeElement}
  */
-export function createLinkElement( internalLink, writer ) {
+export function createLinkElement( elementId, writer ) {
 	// Priority 5 - https://github.com/ckeditor/ckeditor5-link/issues/121.
-	const linkElement = writer.createAttributeElement( 'a', { 'data-elementid': internalLink, class: 'internalLink' }, { priority: 5 } );
-	writer.setCustomProperty( 'linkInternal', true, linkElement );
+	const linkElement = writer.createAttributeElement( 'a', { [ htmlIdAttribute ]: elementId, class: htmlClassName }, { priority: 5 } );
+	writer.setCustomProperty( internalLinkCustomProperty, true, linkElement );
 
 	return linkElement;
 }

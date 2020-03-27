@@ -3,6 +3,8 @@
  * For licensing, see LICENSE.md.
  */
 
+import { modelIdAttribute, internalLinkCustomProperty } from '../constants';
+
 /**
  * @module link/utils
  */
@@ -56,12 +58,12 @@ export default class AutomaticDecorators {
 	 */
 	getDispatcher() {
 		return dispatcher => {
-			dispatcher.on( 'attribute:internalLink', ( evt, data, conversionApi ) => {
+			dispatcher.on( `attribute:${ modelIdAttribute }`, ( evt, data, conversionApi ) => {
 				// There is only test as this behavior decorates links and
 				// it is run before dispatcher which actually consumes this node.
 				// This allows on writing own dispatcher with highest priority,
 				// which blocks both native converter and this additional decoration.
-				if ( !conversionApi.consumable.test( data.item, 'attribute:internalLink' ) ) {
+				if ( !conversionApi.consumable.test( data.item, `attribute:${ modelIdAttribute }` ) ) {
 					return;
 				}
 				const viewWriter = conversionApi.writer;
@@ -71,7 +73,7 @@ export default class AutomaticDecorators {
 					const viewElement = viewWriter.createAttributeElement( 'a', item.attributes, {
 						priority: 5
 					} );
-					viewWriter.setCustomProperty( 'linkInternal', true, viewElement );
+					viewWriter.setCustomProperty( internalLinkCustomProperty, true, viewElement );
 					if ( item.callback( data.attributeNewValue ) ) {
 						if ( data.item.is( 'selection' ) ) {
 							viewWriter.wrap( viewSelection.getFirstRange(), viewElement );

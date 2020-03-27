@@ -9,6 +9,7 @@
 
 import Command from '@ckeditor/ckeditor5-core/src/command';
 import findLinkRange from './findlinkrange';
+import { modelIdAttribute, linkCommandName } from './constants';
 
 /**
  * The unlink command. It is used by the {@link module:link/link~Link link plugin}.
@@ -20,19 +21,20 @@ export default class UnlinkCommand extends Command {
 	 * @inheritDoc
 	 */
 	refresh() {
-		this.isEnabled = this.editor.model.document.selection.hasAttribute( 'internalLink' );
+		this.isEnabled = this.editor.model.document.selection.hasAttribute( modelIdAttribute );
 	}
 
 	/**
 	 * Executes the command.
 	 *
-	 * When the selection is collapsed, it removes the `internalLink` attribute from each node with the same `internalLink` attribute value.
-	 * When the selection is non-collapsed, it removes the `internalLink` attribute from each node in selected ranges.
+	 * When the selection is collapsed, it removes the `modelIdAttribute` attribute from each node
+	 * with the same `modelIdAttribute` attribute value.
+	 * When the selection is non-collapsed, it removes the `modelIdAttribute` attribute from each node in selected ranges.
 	 *
 	 * # Decorators
 	 *
 	 * If {@link module:link/link~LinkConfig#decorators `config.link.decorators`} is specified,
-	 * all configured decorators are removed together with the `internalLink` attribute.
+	 * all configured decorators are removed together with the `modelIdAttribute` attribute.
 	 *
 	 * @fires execute
 	 */
@@ -40,16 +42,17 @@ export default class UnlinkCommand extends Command {
 		const editor = this.editor;
 		const model = this.editor.model;
 		const selection = model.document.selection;
-		const linkCommand = editor.commands.get( 'linkInternal' );
+		const linkCommand = editor.commands.get( linkCommandName );
 
 		model.change( writer => {
 			// Get ranges to unlink.
 			const rangesToUnlink = selection.isCollapsed ?
-				[ findLinkRange( selection.getFirstPosition(), selection.getAttribute( 'internalLink' ), model ) ] : selection.getRanges();
+				[ findLinkRange( selection.getFirstPosition(),
+					selection.getAttribute( modelIdAttribute ), model ) ] : selection.getRanges();
 
-			// Remove `internalLink` attribute from specified ranges.
+			// Remove `modelIdAttribute` attribute from specified ranges.
 			for ( const range of rangesToUnlink ) {
-				writer.removeAttribute( 'internalLink', range );
+				writer.removeAttribute( modelIdAttribute, range );
 				// If there are registered custom attributes, then remove them during unlink.
 				if ( linkCommand ) {
 					for ( const manualDecorator of linkCommand.manualDecorators ) {

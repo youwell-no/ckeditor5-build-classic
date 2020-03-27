@@ -12,6 +12,9 @@ import { ensureSafeUrl } from '../utils';
 import unlinkIcon from '../../../../theme/icons/unlink.svg';
 import pencilIcon from '@ckeditor/ckeditor5-core/theme/icons/pencil.svg';
 import '../../../../theme/linkactions.css';
+import { unlinkCommandName } from '../constants';
+
+export const actionsViewLinkValue = 'internalLinkValue';
 
 export default class LinkActionsView extends View {
 	constructor( locale ) {
@@ -22,9 +25,9 @@ export default class LinkActionsView extends View {
 		this.focusTracker = new FocusTracker();
 		this.keystrokes = new KeystrokeHandler();
 		this.previewButtonView = this._createPreviewButton();
-		this.unlinkButtonView = this._createButton( t( 'Unlink' ), unlinkIcon, 'unlinkInternal' );
+		this.unlinkButtonView = this._createButton( t( 'Unlink' ), unlinkIcon, unlinkCommandName );
 		this.editButtonView = this._createButton( t( 'Edit link' ), pencilIcon, 'edit' );
-		this.set( 'internalLink' );
+		this.set( actionsViewLinkValue );
 		this._focusables = new ViewCollection();
 		this._focusCycler = new FocusCycler( {
 			focusables: this._focusables,
@@ -133,17 +136,17 @@ export default class LinkActionsView extends View {
 					'ck',
 					'ck-link-actions__preview'
 				],
-				internalLink: bind.to( 'internalLink', href => href && ensureSafeUrl( href ) ),
+				[ actionsViewLinkValue ]: bind.to( actionsViewLinkValue, href => href && ensureSafeUrl( href ) ),
 			}
 		} );
 
-		button.bind( 'label' ).to( this, 'internalLink', href => {
+		button.bind( 'label' ).to( this, actionsViewLinkValue, href => {
 			return href || t( 'This link has no URL' );
 		} );
 
-		button.bind( 'isEnabled' ).to( this, 'internalLink', href => !!href );
+		button.bind( 'isEnabled' ).to( this, actionsViewLinkValue, href => !!href );
 
-		button.template.tag = 'a';
+		button.template.tag = 'span';
 		button.template.eventListeners = {};
 
 		return button;

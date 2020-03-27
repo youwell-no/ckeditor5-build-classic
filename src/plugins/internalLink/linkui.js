@@ -12,16 +12,17 @@ import ClickObserver from '@ckeditor/ckeditor5-engine/src/view/observer/clickobs
 import { isLinkElement } from './utils';
 import ContextualBalloon from '@ckeditor/ckeditor5-ui/src/panel/balloon/contextualballoon';
 
-import clickOutsideHandler from '@ckeditor/ckeditor5-ui/src/bindings/clickoutsidehandler';
+// import clickOutsideHandler from '@ckeditor/ckeditor5-ui/src/bindings/clickoutsidehandler';
 
 import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview';
 import LinkFormView from './ui/linkformview';
-import LinkActionsView from './ui/linkactionsview';
+import LinkActionsView, { actionsViewLinkValue } from './ui/linkactionsview';
 
 import linkIcon from '../../../theme/icons/link2.svg';
+import { tooltipItemName, linkCommandName, unlinkCommandName } from './constants';
 
 /**
- * The link UI plugin. It introduces the `'linkInternal'` and `'unlinkInternal'` buttons.
+ * The link UI plugin. It introduces the `linkCommandName` and `unlinkCommandName` buttons.
  *
  * It uses the
  * {@link module:ui/panel/balloon/contextualballoon~ContextualBalloon contextual balloon plugin}.
@@ -52,7 +53,7 @@ export default class LinkUI extends Plugin {
 		editor.editing.view.addObserver( ClickObserver );
 
 		this.actionsView = this._createActionsView();
-		this.formView = this._createFormView();
+		// this.formView = this._createFormView();
 		this._balloon = editor.plugins.get( ContextualBalloon );
 
 		this._checkForSelectMethod();
@@ -67,7 +68,7 @@ export default class LinkUI extends Plugin {
 		super.destroy();
 
 		// Destroy created UI components as they are not automatically destroyed (see ckeditor5#1341).
-		this.formView.destroy();
+		// this.formView.destroy();
 	}
 
 	_checkForSelectMethod() {
@@ -89,12 +90,12 @@ export default class LinkUI extends Plugin {
 		const editor = this.editor;
 
 		this.linkObjectSelector.select(
-			linkObject => {
-				editor.execute( 'linkInternal', linkObject.id, { someExtraAttr: '123' } );
+			linkedObject => {
+				editor.execute( linkCommandName, linkedObject );
 
 				// samme som:
-				// const linkCommand = editor.commands.get( 'linkInternal' );
-				// linkCommand.execute( linkObject.id, { someExtraAttr: '123' } );
+				// const linkCommand = editor.commands.get( linkCommandName );
+				// linkCommand.execute( linkObject.id );
 			}
 		);
 	}
@@ -108,10 +109,10 @@ export default class LinkUI extends Plugin {
 	_createActionsView() {
 		const editor = this.editor;
 		const actionsView = new LinkActionsView( editor.locale );
-		const linkCommand = editor.commands.get( 'linkInternal' );
-		const unlinkCommand = editor.commands.get( 'unlinkInternal' );
+		const linkCommand = editor.commands.get( linkCommandName );
+		const unlinkCommand = editor.commands.get( unlinkCommandName );
 
-		actionsView.bind( 'internalLink' ).to( linkCommand, 'value' );
+		actionsView.bind( actionsViewLinkValue ).to( linkCommand, 'value' );
 		actionsView.editButtonView.bind( 'isEnabled' ).to( linkCommand );
 		actionsView.unlinkButtonView.bind( 'isEnabled' ).to( unlinkCommand );
 
@@ -121,8 +122,8 @@ export default class LinkUI extends Plugin {
 		} );
 
 		// Execute unlink command after clicking on the "Unlink" button.
-		this.listenTo( actionsView, 'unlinkInternal', () => {
-			editor.execute( 'unlinkInternal' );
+		this.listenTo( actionsView, unlinkCommandName, () => {
+			editor.execute( unlinkCommandName );
 			this._hideUI();
 		} );
 
@@ -143,7 +144,7 @@ export default class LinkUI extends Plugin {
 	 */
 	_createFormView() {
 		const editor = this.editor;
-		const linkCommand = editor.commands.get( 'linkInternal' );
+		const linkCommand = editor.commands.get( linkCommandName );
 
 		const formView = new LinkFormView( editor.locale, linkCommand.manualDecorators );
 
@@ -155,7 +156,7 @@ export default class LinkUI extends Plugin {
 
 		// Execute link command after clicking the "Save" button.
 		this.listenTo( formView, 'submit', () => {
-			editor.execute( 'linkInternal', formView.urlInputView.inputView.element.value, formView.getDecoratorSwitchesState() );
+			editor.execute( linkCommandName, formView.urlInputView.inputView.element.value, formView.getDecoratorSwitchesState() );
 			this._closeFormView();
 		} );
 
@@ -181,10 +182,10 @@ export default class LinkUI extends Plugin {
 	 */
 	_createToolbarLinkButton() {
 		const editor = this.editor;
-		const linkCommand = editor.commands.get( 'linkInternal' );
+		const linkCommand = editor.commands.get( linkCommandName );
 		const t = editor.t;
 
-		editor.ui.componentFactory.add( 'internalLink', locale => {
+		editor.ui.componentFactory.add( tooltipItemName, locale => {
 			const button = new ButtonView( locale );
 
 			button.isEnabled = true;
@@ -246,12 +247,12 @@ export default class LinkUI extends Plugin {
 		} );
 
 		// Close on click outside of balloon panel element.
-		clickOutsideHandler( {
-			emitter: this.formView,
-			activator: () => this._isUIInPanel,
-			contextElements: [ this._balloon.view.element ],
-			callback: () => this._hideUI()
-		} );
+		// clickOutsideHandler( {
+		// 	emitter: this.formView,
+		// 	activator: () => this._isUIInPanel,
+		// 	contextElements: [ this._balloon.view.element ],
+		// 	callback: () => this._hideUI()
+		// } );
 	}
 
 	/**
@@ -280,26 +281,28 @@ export default class LinkUI extends Plugin {
 			return;
 		}
 
-		const editor = this.editor;
-		const linkCommand = editor.commands.get( 'linkInternal' );
+		this._selectElement();
 
-		this._balloon.add( {
-			view: this.formView,
-			position: this._getBalloonPositionData()
-		} );
+		// const editor = this.editor;
+		// const linkCommand = editor.commands.get( linkCommandName );
 
-		// Select input when form view is currently visible.
-		if ( this._balloon.visibleView === this.formView ) {
-			this.formView.urlInputView.select();
-		}
+		// this._balloon.add( {
+		// 	view: this.formView,
+		// 	position: this._getBalloonPositionData()
+		// } );
 
-		// Make sure that each time the panel shows up, the URL field remains in sync with the value of
-		// the command. If the user typed in the input, then canceled the balloon (`urlInputView#value` stays
-		// unaltered) and re-opened it without changing the value of the link command (e.g. because they
-		// clicked the same link), they would see the old value instead of the actual value of the command.
-		// https://github.com/ckeditor/ckeditor5-link/issues/78
-		// https://github.com/ckeditor/ckeditor5-link/issues/123
-		this.formView.urlInputView.inputView.element.value = linkCommand.value || '';
+		// // Select input when form view is currently visible.
+		// if ( this._balloon.visibleView === this.formView ) {
+		// 	this.formView.urlInputView.select();
+		// }
+
+		// // Make sure that each time the panel shows up, the URL field remains in sync with the value of
+		// // the command. If the user typed in the input, then canceled the balloon (`urlInputView#value` stays
+		// // unaltered) and re-opened it without changing the value of the link command (e.g. because they
+		// // clicked the same link), they would see the old value instead of the actual value of the command.
+		// // https://github.com/ckeditor/ckeditor5-link/issues/78
+		// // https://github.com/ckeditor/ckeditor5-link/issues/123
+		// this.formView.urlInputView.inputView.element.value = linkCommand.value || '';
 	}
 
 	/**
@@ -312,7 +315,7 @@ export default class LinkUI extends Plugin {
 	 * @private
 	 */
 	_closeFormView() {
-		const linkCommand = this.editor.commands.get( 'linkInternal' );
+		const linkCommand = this.editor.commands.get( linkCommandName );
 
 		// Restore manual decorator states to represent the current model state. This case is important to reset the switch buttons
 		// when the user cancels the editing form.
@@ -405,7 +408,7 @@ export default class LinkUI extends Plugin {
 		editor.editing.view.focus();
 
 		// Remove form first because it's on top of the stack.
-		this._removeFormView();
+		// this._removeFormView();
 
 		// Then remove the actions view because it's beneath the form.
 		this._balloon.remove( this.actionsView );

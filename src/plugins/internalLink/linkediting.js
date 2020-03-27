@@ -16,6 +16,7 @@ import ManualDecorator from './utils/manualdecorator';
 import bindTwoStepCaretToAttribute from '@ckeditor/ckeditor5-engine/src/utils/bindtwostepcarettoattribute';
 import findLinkRange from './findlinkrange';
 import '../../../theme/link.css';
+import { modelIdAttribute, editorConfigName, linkCommandName, unlinkCommandName, internalLinkCustomProperty } from './constants';
 
 const HIGHLIGHT_CLASS = 'ck-link_selected';
 const DECORATOR_AUTOMATIC = 'automatic';
@@ -25,8 +26,8 @@ const DECORATOR_MANUAL = 'manual';
 /**
  * The link engine feature.
  *
- * It introduces the `internalLink="url"` attribute in the model which renders to the view as a `<a href="url">` element
- * as well as `'linkInternal'` and `'unlinkInternal'` commands.
+ * It introduces the `modelIdAttribute="url"` attribute in the model which renders to the view as a `<a href="url">` element
+ * as well as `'linkCommandName'` and `'unlinkCommandName'` commands.
  *
  * @extends module:core/plugin~Plugin
  */
@@ -44,7 +45,7 @@ export default class LinkEditing extends Plugin {
 	// constructor( editor ) {
 	// 	super( editor );
 
-	// 	// editor.config.define( 'linkInternal', {
+	// 	// editor.config.define( linkCommandName, {
 	// 	// 	addTargetToExternalLinks: false
 	// 	// } );
 	// }
@@ -57,13 +58,13 @@ export default class LinkEditing extends Plugin {
 		const locale = editor.locale;
 
 		// Allow link attribute on all inline nodes.
-		editor.model.schema.extend( '$text', { allowAttributes: 'internalLink' } );
+		editor.model.schema.extend( '$text', { allowAttributes: modelIdAttribute } );
 
 		editor.conversion.for( 'dataDowncast' )
-			.attributeToElement( { model: 'internalLink', view: createLinkElement } );
+			.attributeToElement( { model: modelIdAttribute, view: createLinkElement } );
 
 		editor.conversion.for( 'editingDowncast' )
-			.attributeToElement( { model: 'internalLink', view: ( href, writer ) => {
+			.attributeToElement( { model: modelIdAttribute, view: ( href, writer ) => {
 				return createLinkElement( ensureSafeUrl( href ), writer );
 			} } );
 
@@ -72,30 +73,31 @@ export default class LinkEditing extends Plugin {
 				view: {
 					name: 'a',
 					attributes: {
-						internalLink: true
+						[ modelIdAttribute ]: true
 					}
 				},
 				model: {
-					key: 'internalLink',
-					value: viewElement => viewElement.getAttribute( 'internalLink' )
+					key: modelIdAttribute,
+					value: viewElement => viewElement.getAttribute( modelIdAttribute )
 				}
 			} );
 
 		// Create linking commands.
-		editor.commands.add( 'linkInternal', new LinkCommand( editor ) );
-		editor.commands.add( 'unlinkInternal', new UnlinkCommand( editor ) );
+		editor.commands.add( linkCommandName, new LinkCommand( editor ) );
+		editor.commands.add( unlinkCommandName, new UnlinkCommand( editor ) );
 
-		const linkDecorators = getLocalizedDecorators( editor.t, normalizeDecorators( editor.config.get( 'internalLink.decorators' ) ) );
+		const linkDecorators = getLocalizedDecorators( editor.t,
+			normalizeDecorators( editor.config.get( `${ editorConfigName }.decorators` ) ) );
 
 		this._enableAutomaticDecorators( linkDecorators.filter( item => item.mode === DECORATOR_AUTOMATIC ) );
 		this._enableManualDecorators( linkDecorators.filter( item => item.mode === DECORATOR_MANUAL ) );
 
-		// Enable two-step caret movement for `internalLink` attribute.
+		// Enable two-step caret movement for `modelIdAttribute` attribute.
 		bindTwoStepCaretToAttribute( {
 			view: editor.editing.view,
 			model: editor.model,
 			emitter: this,
-			attribute: 'internalLink',
+			attribute: modelIdAttribute,
 			locale
 		} );
 
@@ -157,7 +159,7 @@ export default class LinkEditing extends Plugin {
 		}
 
 		const editor = this.editor;
-		const command = editor.commands.get( 'linkInternal' );
+		const command = editor.commands.get( linkCommandName );
 		const manualDecorators = command.manualDecorators;
 
 		manualDecoratorDefinitions.forEach( decorator => {
@@ -172,7 +174,7 @@ export default class LinkEditing extends Plugin {
 					if ( manualDecoratorName ) {
 						const attributes = manualDecorators.get( decorator.id ).attributes;
 						const element = writer.createAttributeElement( 'a', attributes, { priority: 5 } );
-						writer.setCustomProperty( 'linkInternal', true, element );
+						writer.setCustomProperty( internalLinkCustomProperty, true, element );
 
 						return element;
 					}
@@ -214,8 +216,8 @@ export default class LinkEditing extends Plugin {
 			const selection = editor.model.document.selection;
 			let changed = false;
 
-			if ( selection.hasAttribute( 'internalLink' ) ) {
-				const modelRange = findLinkRange( selection.getFirstPosition(), selection.getAttribute( 'internalLink' ), editor.model );
+			if ( selection.hasAttribute( modelIdAttribute ) ) {
+				const modelRange = findLinkRange( selection.getFirstPosition(), selection.getAttribute( modelIdAttribute ), editor.model );
 				const viewRange = editor.editing.mapper.toViewRange( modelRange );
 
 				// There might be multiple `a` elements in the `viewRange`, for example, when the `a` element is
