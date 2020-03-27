@@ -7,14 +7,12 @@ import FocusTracker from '@ckeditor/ckeditor5-utils/src/focustracker';
 import FocusCycler from '@ckeditor/ckeditor5-ui/src/focuscycler';
 import KeystrokeHandler from '@ckeditor/ckeditor5-utils/src/keystrokehandler';
 
-import { ensureSafeUrl } from '../utils';
-
 import unlinkIcon from '../../../../theme/icons/unlink.svg';
 import pencilIcon from '@ckeditor/ckeditor5-core/theme/icons/pencil.svg';
 import '../../../../theme/linkactions.css';
 import { unlinkCommandName } from '../constants';
 
-export const actionsViewLinkValue = 'internalLinkValue';
+export const actionsViewLinkValue = 'internalLinkElementId';
 
 export default class LinkActionsView extends View {
 	constructor( locale ) {
@@ -123,11 +121,10 @@ export default class LinkActionsView extends View {
 	_createPreviewButton() {
 		const button = new ButtonView( this.locale );
 		const bind = this.bindTemplate;
-		const t = this.t;
+		// const t = this.t;
 
 		button.set( {
 			withText: true,
-			tooltip: t( 'Open link in new tab' )
 		} );
 
 		button.extendTemplate( {
@@ -136,15 +133,15 @@ export default class LinkActionsView extends View {
 					'ck',
 					'ck-link-actions__preview'
 				],
-				[ actionsViewLinkValue ]: bind.to( actionsViewLinkValue, href => href && ensureSafeUrl( href ) ),
+				[ actionsViewLinkValue ]: bind.to( actionsViewLinkValue ),
 			}
 		} );
 
-		button.bind( 'label' ).to( this, actionsViewLinkValue, href => {
-			return href || t( 'This link has no URL' );
+		button.bind( 'label' ).to( this, actionsViewLinkValue, id => {
+			return this.lookupElement ? this.lookupElement( id ) : id;
 		} );
 
-		button.bind( 'isEnabled' ).to( this, actionsViewLinkValue, href => !!href );
+		// button.bind( 'isEnabled' ).to( this, actionsViewLinkValue, href => !!href );
 
 		button.template.tag = 'span';
 		button.template.eventListeners = {};

@@ -23,7 +23,7 @@
 		<h2>About CKEditor&nbsp;5</h2>
 
 		<p>This is <a href="https://ckeditor.com">CKEditor&nbsp;5</a>.</p>
-
+		<p>Her er en <a class="internalLink" data-elementid="1234">intern link</a> som peker på id="1234"</p>
 		<figure class="image image-style-align-right" ><img src="./sample.jpg"></figure>
 	</div>
 
@@ -46,9 +46,10 @@
 				select: selectedCallback => {
 					selectedCallback({
 						name: 'some name',
-						id: 'some id'
+						id: `ID-${Date.now()}-ID`,
 					});
-				}
+				},
+				lookup: elementId => (`Looked up: ${elementId}`),
 			};
 		}
 

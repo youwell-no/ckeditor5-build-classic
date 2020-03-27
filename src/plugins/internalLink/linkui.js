@@ -44,6 +44,12 @@ export default class LinkUI extends Plugin {
 		return 'InternalLinkUI';
 	}
 
+	constructor( editor ) {
+		super( editor );
+
+		this.nameLookup = {};
+	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -89,8 +95,15 @@ export default class LinkUI extends Plugin {
 	_selectElement() {
 		const editor = this.editor;
 
+		if ( !this.linkObjectSelector || !this.linkObjectSelector.select ) {
+			// eslint-disable-next-line no-undef
+			console.error( 'No select function!' );
+			return;
+		}
+
 		this.linkObjectSelector.select(
 			linkedObject => {
+				this.nameLookup[ linkedObject.id ] = linkedObject.name;
 				editor.execute( linkCommandName, linkedObject );
 
 				// samme som:
@@ -98,6 +111,18 @@ export default class LinkUI extends Plugin {
 				// linkCommand.execute( linkObject.id );
 			}
 		);
+	}
+
+	_lookupElement( elementId ) {
+		if ( this.nameLookup[ elementId ] ) {
+			return this.nameLookup[ elementId ];
+		}
+
+		if ( !this.linkObjectSelector || !this.linkObjectSelector.lookup ) {
+			return elementId;
+		}
+
+		return this.linkObjectSelector.lookup( elementId ) || elementId;
 	}
 
 	/**
@@ -115,6 +140,7 @@ export default class LinkUI extends Plugin {
 		actionsView.bind( actionsViewLinkValue ).to( linkCommand, 'value' );
 		actionsView.editButtonView.bind( 'isEnabled' ).to( linkCommand );
 		actionsView.unlinkButtonView.bind( 'isEnabled' ).to( unlinkCommand );
+		actionsView.lookupElement = this._lookupElement.bind( this );
 
 		// Execute unlink command after clicking on the "Edit" button.
 		this.listenTo( actionsView, 'edit', () => {
