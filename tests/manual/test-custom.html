@@ -23,7 +23,9 @@
 		<h2>About CKEditor&nbsp;5</h2>
 
 		<p>This is <a href="https://ckeditor.com">CKEditor&nbsp;5</a>.</p>
+
 		<p>Her er en <a class="internalLink" data-elementid="1234">intern link</a> som peker på id="1234"</p>
+
 		<figure class="image image-style-align-right" ><img src="./sample.jpg"></figure>
 	</div>
 
@@ -36,6 +38,7 @@
 		<p>This is <a href="https://ckeditor.com">CKEditor&nbsp;5</a>.</p>
 	</div>
 
+	<script src="../../node_modules/@ckeditor/ckeditor5-inspector/build/inspector.js"></script>
 	<script src="../../build/index.js"></script>
 	<script src="../../build/translations/no.js"></script>
 	<script>
@@ -60,6 +63,7 @@
 			})
 			.then(editor => {
 				window.editor = editor;
+				CKEditorInspector.attach( editor );
 			})
 			.catch(err => {
 				console.error(err.stack);
@@ -97,7 +101,6 @@
 			});
 
 	</script>
-
 </body>
 
 </html>

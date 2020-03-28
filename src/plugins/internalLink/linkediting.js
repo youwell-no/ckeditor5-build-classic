@@ -10,49 +10,24 @@
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
 import LinkCommand from './linkcommand';
 import UnlinkCommand from './unlinkcommand';
-import { createLinkElement, ensureSafeUrl, getLocalizedDecorators, normalizeDecorators } from './utils';
+import { createLinkElement, getLocalizedDecorators, normalizeDecorators } from './utils';
 import AutomaticDecorators from './utils/automaticdecorators';
 import ManualDecorator from './utils/manualdecorator';
 import bindTwoStepCaretToAttribute from '@ckeditor/ckeditor5-engine/src/utils/bindtwostepcarettoattribute';
 import findLinkRange from './findlinkrange';
 import '../../../theme/link.css';
-import { modelIdAttribute, editorConfigName, linkCommandName, unlinkCommandName, internalLinkCustomProperty } from './constants';
+import { modelIdAttribute, editorConfigName, linkCommandName, unlinkCommandName, internalLinkCustomProperty,
+	htmlClassName, htmlIdAttribute } from './constants';
 
 const HIGHLIGHT_CLASS = 'ck-link_selected';
 const DECORATOR_AUTOMATIC = 'automatic';
 const DECORATOR_MANUAL = 'manual';
-// const EXTERNAL_LINKS_REGEXP = /^(https?:)?\/\//;
 
-/**
- * The link engine feature.
- *
- * It introduces the `modelIdAttribute="url"` attribute in the model which renders to the view as a `<a href="url">` element
- * as well as `'linkCommandName'` and `'unlinkCommandName'` commands.
- *
- * @extends module:core/plugin~Plugin
- */
 export default class LinkEditing extends Plugin {
-	/**
-	 * @inheritDoc
-	 */
 	static get pluginName() {
 		return 'InternalLinkEditing';
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	// constructor( editor ) {
-	// 	super( editor );
-
-	// 	// editor.config.define( linkCommandName, {
-	// 	// 	addTargetToExternalLinks: false
-	// 	// } );
-	// }
-
-	/**
-	 * @inheritDoc
-	 */
 	init() {
 		const editor = this.editor;
 		const locale = editor.locale;
@@ -60,27 +35,27 @@ export default class LinkEditing extends Plugin {
 		// Allow link attribute on all inline nodes.
 		editor.model.schema.extend( '$text', { allowAttributes: modelIdAttribute } );
 
+		editor.conversion.for( 'upcast' ).elementToAttribute( {
+			view: {
+				name: 'a',
+				attributes: {
+					[ htmlIdAttribute ]: true
+				},
+				classes: [ htmlClassName ]
+			},
+
+			model: {
+				key: modelIdAttribute,
+				value: viewElement => viewElement.getAttribute( htmlIdAttribute )
+			}
+		}
+		);
+
 		editor.conversion.for( 'dataDowncast' )
 			.attributeToElement( { model: modelIdAttribute, view: createLinkElement } );
 
 		editor.conversion.for( 'editingDowncast' )
-			.attributeToElement( { model: modelIdAttribute, view: ( href, writer ) => {
-				return createLinkElement( ensureSafeUrl( href ), writer );
-			} } );
-
-		editor.conversion.for( 'upcast' )
-			.elementToAttribute( {
-				view: {
-					name: 'a',
-					attributes: {
-						[ modelIdAttribute ]: true
-					}
-				},
-				model: {
-					key: modelIdAttribute,
-					value: viewElement => viewElement.getAttribute( modelIdAttribute )
-				}
-			} );
+			.attributeToElement( { model: modelIdAttribute, view: createLinkElement } );
 
 		// Create linking commands.
 		editor.commands.add( linkCommandName, new LinkCommand( editor ) );

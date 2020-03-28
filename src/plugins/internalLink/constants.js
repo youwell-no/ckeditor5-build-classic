@@ -1,5 +1,5 @@
-export const modelIdAttribute = 'internalLink';
-export const modelNameAttribute = 'taskname';
+export const modelIdAttribute = 'internalLinkTaskId';
+export const modelNameAttribute = 'internalLinkTaskName';
 
 export const htmlIdAttribute = 'data-elementid';
 export const htmlNameAttribute = 'data-elementname';

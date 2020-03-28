@@ -113,7 +113,7 @@ export default class LinkActionsView extends View {
 	}
 
 	/**
-	 * Creates a link href preview button.
+	 * Creates a preview button.
 	 *
 	 * @private
 	 * @returns {module:ui/button/buttonview~ButtonView} The button view instance.
@@ -142,6 +142,7 @@ export default class LinkActionsView extends View {
 		} );
 
 		// button.bind( 'isEnabled' ).to( this, actionsViewLinkValue, href => !!href );
+		button.isEnabled = false;
 
 		button.template.tag = 'span';
 		button.template.eventListeners = {};

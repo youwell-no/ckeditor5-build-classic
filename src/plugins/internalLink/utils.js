@@ -24,9 +24,9 @@ export function isLinkElement( node ) {
 }
 
 /**
- * Creates link {@link module:engine/view/attributeelement~AttributeElement} with the provided `href` attribute.
+ * Creates link {@link module:engine/view/attributeelement~AttributeElement} with the provided `elementId` attribute.
  *
- * @param {String} href
+ * @param {String} elementId
  * @returns {module:engine/view/attributeelement~AttributeElement}
  */
 export function createLinkElement( elementId, writer ) {
