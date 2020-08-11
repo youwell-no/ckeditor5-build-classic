@@ -8,12 +8,13 @@
  */
 
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
+import TwoStepCaretMovement from '@ckeditor/ckeditor5-typing/src/twostepcaretmovement';
+
 import LinkCommand from './linkcommand';
 import UnlinkCommand from './unlinkcommand';
 import { createLinkElement, getLocalizedDecorators, normalizeDecorators } from './utils';
 import AutomaticDecorators from './utils/automaticdecorators';
 import ManualDecorator from './utils/manualdecorator';
-import bindTwoStepCaretToAttribute from '@ckeditor/ckeditor5-engine/src/utils/bindtwostepcarettoattribute';
 import findLinkRange from './findlinkrange';
 import '../../../theme/link.css';
 import { modelIdAttribute, editorConfigName, linkCommandName, unlinkCommandName, internalLinkCustomProperty,
@@ -30,7 +31,6 @@ export default class LinkEditing extends Plugin {
 
 	init() {
 		const editor = this.editor;
-		const locale = editor.locale;
 
 		// Allow link attribute on all inline nodes.
 		editor.model.schema.extend( '$text', { allowAttributes: modelIdAttribute } );
@@ -68,13 +68,8 @@ export default class LinkEditing extends Plugin {
 		this._enableManualDecorators( linkDecorators.filter( item => item.mode === DECORATOR_MANUAL ) );
 
 		// Enable two-step caret movement for `modelIdAttribute` attribute.
-		bindTwoStepCaretToAttribute( {
-			view: editor.editing.view,
-			model: editor.model,
-			emitter: this,
-			attribute: modelIdAttribute,
-			locale
-		} );
+		const twoStepCaretMovementPlugin = editor.plugins.get( TwoStepCaretMovement );
+		twoStepCaretMovementPlugin.registerAttribute( modelIdAttribute );
 
 		// Setup highlight over selected link.
 		this._setupLinkHighlight();
