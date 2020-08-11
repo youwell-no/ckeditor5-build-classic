@@ -47,6 +47,8 @@ import Superscript from '@ckeditor/ckeditor5-basic-styles/src/superscript';
 import InternalLink from './plugins/internalLink';
 // ------
 
+import * as defaultConfig from './editorConfig';
+
 export default class ClassicEditor extends ClassicEditorBase {}
 
 // Plugins to include in the build.
@@ -92,72 +94,10 @@ ClassicEditor.builtinPlugins = [
 
 // Editor configuration.
 ClassicEditor.defaultConfig = {
-	codeBlock: {
-		languages: [
-			{ language: 'plaintext', label: 'Plain text' },
-			// { language: 'javascript', label: 'JavaScript' },
-		]
-	},
-	toolbar: {
-		items: [
-			'heading',
-			'|',
-			'bold',
-			'italic',
-			'underline',
-			'strikethrough',
-			'subscript',
-			'superscript',
-			'alignment',
-			'blockQuote',
-			'code',
-			'codeBlock',
-			'|',
-			'fontSize',
-			'fontColor',
-			'fontBackgroundColor',
-			'|',
-			'bulletedList',
-			'numberedList',
-			'link',
-			'internalLink',
-			'|',
-			'indent',
-			'outdent',
-			'|',
-			'imageUpload',
-			'insertTable',
-			'mediaEmbed',
-			'|',
-			'undo',
-			'redo'
-		]
-	},
-	image: {
-		styles: [
-			'full',
-			'alignLeft',
-			'alignCenter',
-			'alignRight',
-		],
-		toolbar: [
-			'imageTextAlternative',
-			'|',
-			'imageStyle:full',
-			'imageStyle:alignLeft',
-			'imageStyle:alignCenter',
-			'imageStyle:alignRight'
-		],
-	},
-	table: {
-		contentToolbar: [
-			'tableColumn',
-			'tableRow',
-			'mergeTableCells',
-			'tableProperties',
-			'tableCellProperties',
-		]
-	},
-	// This value must be kept in sync with the language defined in webpack.config.js.
-	language: 'en',
+	toolbar: defaultConfig.fullToolbar,
+	language: defaultConfig.language,
+	codeBlock: defaultConfig.codeBlock,
+	image: defaultConfig.image,
+	table: defaultConfig.table,
+	link: defaultConfig.link,
 };

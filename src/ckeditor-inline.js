@@ -27,6 +27,8 @@ import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph';
 import PasteFromOffice from '@ckeditor/ckeditor5-paste-from-office/src/pastefromoffice';
 import Table from '@ckeditor/ckeditor5-table/src/table';
 import TableToolbar from '@ckeditor/ckeditor5-table/src/tabletoolbar';
+import TableProperties from '@ckeditor/ckeditor5-table/src/tableproperties';
+import TableCellProperties from '@ckeditor/ckeditor5-table/src/tablecellproperties';
 
 // ------ Added packages
 import Highlight from '@ckeditor/ckeditor5-highlight/src/highlight';
@@ -41,6 +43,8 @@ import Superscript from '@ckeditor/ckeditor5-basic-styles/src/superscript';
 // ---- Custom plugins
 import InternalLink from './plugins/internalLink';
 // ------
+
+import * as defaultConfig from './editorConfig';
 
 export default class InlineEditor extends InlineEditorBase {}
 
@@ -67,6 +71,8 @@ InlineEditor.builtinPlugins = [
 	PasteFromOffice,
 	Table,
 	TableToolbar,
+	TableProperties,
+	TableCellProperties,
 	Highlight,
 	Alignment,
 	Underline,
@@ -79,43 +85,10 @@ InlineEditor.builtinPlugins = [
 
 // Editor configuration.
 InlineEditor.defaultConfig = {
-	toolbar: {
-		items: [
-			'heading',
-			'|',
-			'bold',
-			'italic',
-			'underline', 'strikethrough', 'code', 'subscript', 'superscript',
-			'alignment',
-			'blockQuote',
-			'|',
-			'bulletedList',
-			'numberedList',
-			'link',
-			'imageUpload',
-			'highlight',
-			'insertTable',
-			'mediaEmbed',
-			'|',
-			'undo',
-			'redo'
-		]
-	},
-	image: {
-		toolbar: [
-			'imageStyle:full',
-			'imageStyle:side',
-			'|',
-			'imageTextAlternative'
-		]
-	},
-	table: {
-		contentToolbar: [
-			'tableColumn',
-			'tableRow',
-			'mergeTableCells'
-		]
-	},
-	// This value must be kept in sync with the language defined in webpack.config.js.
-	language: 'en'
+	toolbar: defaultConfig.limitedToolbar,
+	language: defaultConfig.language,
+	codeBlock: defaultConfig.codeBlock,
+	image: defaultConfig.image,
+	table: defaultConfig.table,
+	link: defaultConfig.link,
 };
