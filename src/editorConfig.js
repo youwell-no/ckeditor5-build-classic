@@ -1,8 +1,8 @@
 export const codeBlock = {
-	languages: [{
-			language: 'plaintext',
-			label: 'Plain text'
-		},
+	languages: [ {
+		language: 'plaintext',
+		label: 'Plain text'
+	},
 		// { language: 'javascript', label: 'JavaScript' },
 	]
 };
@@ -65,7 +65,6 @@ export const limitedToolbar = {
 		'redo'
 	]
 };
-
 
 export const image = {
 	styles: [
